@@ -84,7 +84,7 @@
 <body>
 <header>
   <div class="brand"><b>root@aywen</b>:~$ ./snake <span class="cur"></span></div>
-  <div class="hbtns"><button class="btn" id="trophyBtn" aria-label="Trophées"><svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3"/></svg><span id="tcountBtn">0</span></button><button class="btn" id="assetsBtn" aria-label="Images"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg></button></div>
+  <div class="hbtns"><button class="btn" id="trophyBtn" aria-label="Trophées"><svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3"/></svg><span id="tcountBtn">0</span></button></div>
 </header>
 
 <div class="wrap">
@@ -130,18 +130,6 @@
   </div>
 </div>
 
-<div class="drawer hidden" id="drawer">
-  <div class="sheet">
-    <h2>Assets du jeu</h2>
-    <p>Clique sur une case pour mettre l'image (PNG détouré idéal). C'est gardé dans ton navigateur. Tu peux aussi les déposer dans un dossier <code>assets/</code> à côté du fichier (root.png, aywen.png, lemoustique.png…).</p>
-    <div class="slots" id="slots"></div>
-    <div class="row">
-      <button class="btn" id="resetAssets">Tout réinitialiser</button>
-      <button class="btn primary" id="closeDrawer">OK</button>
-    </div>
-  </div>
-</div>
-<input type="file" id="fileIn" accept="image/*" class="hidden">
 
 <script>
 (() => {
@@ -167,6 +155,8 @@ const ASSETS = [
 ];
 const TEAM = ASSETS.slice(2);
 const imgs = {}; // id -> HTMLImageElement | canvas
+// Photos intégrées (data URI). Vide = on tente assets/<id>.png puis la pastille provisoire.
+const EMBED = {/*EMBED*/};
 
 function placeholder(a){
   const c = document.createElement('canvas'); c.width = c.height = 128;
@@ -193,51 +183,12 @@ function loadImg(src){ return new Promise((res,rej)=>{ const i=new Image(); i.on
 async function initAssets(){
   for(const a of ASSETS) imgs[a.id] = placeholder(a);
   for(const a of ASSETS){
-    const saved = store.get('snakeroot_'+a.id);
-    if(saved){ try{ imgs[a.id] = await loadImg(saved); continue; }catch(e){} }
+    if(EMBED[a.id]){ try{ imgs[a.id] = await loadImg(EMBED[a.id]); continue; }catch(e){} }
     for(const ext of ['png','webp','jpg']){
       try{ imgs[a.id] = await loadImg(`assets/${a.id}.${ext}`); break; }catch(e){}
     }
   }
-  renderSlots();
 }
-
-// ---------- assets drawer ----------
-const drawer = document.getElementById('drawer'), slotsEl = document.getElementById('slots'), fileIn = document.getElementById('fileIn');
-let pickFor = null;
-function renderSlots(){
-  slotsEl.innerHTML = '';
-  for(const a of ASSETS){
-    const s = document.createElement('div'); s.className = 'slot';
-    const c = document.createElement('canvas'); c.width = c.height = 88;
-    const g = c.getContext('2d'); g.drawImage(imgs[a.id],0,0,88,88);
-    s.appendChild(c);
-    const d = document.createElement('div'); d.innerHTML = `<b>${a.label}</b><br><small>${a.role}</small>`;
-    s.appendChild(d);
-    s.onclick = () => { pickFor = a; fileIn.value=''; fileIn.click(); };
-    slotsEl.appendChild(s);
-  }
-}
-fileIn.onchange = async () => {
-  const f = fileIn.files[0]; if(!f || !pickFor) return;
-  const url = URL.createObjectURL(f);
-  try{
-    const i = await loadImg(url);
-    const c = document.createElement('canvas'); c.width = c.height = 192;
-    const g = c.getContext('2d');
-    const s = Math.min(i.width,i.height);
-    g.drawImage(i,(i.width-s)/2,(i.height-s)/2,s,s,0,0,192,192);
-    const data = c.toDataURL('image/png');
-    store.set('snakeroot_'+pickFor.id, data);
-    imgs[pickFor.id] = await loadImg(data);
-    renderSlots(); draw();
-  }catch(e){}
-  URL.revokeObjectURL(url);
-};
-document.getElementById('assetsBtn').onclick = () => { if(state==='play') togglePause(true); drawer.classList.remove('hidden'); };
-document.getElementById('closeDrawer').onclick = () => drawer.classList.add('hidden');
-drawer.onclick = e => { if(e.target===drawer) drawer.classList.add('hidden'); };
-document.getElementById('resetAssets').onclick = async () => { ASSETS.forEach(a=>store.del('snakeroot_'+a.id)); await initAssets(); draw(); };
 
 // ---------- trophées ----------
 const TROPHIES = [
@@ -585,7 +536,7 @@ function loop(now){
 // ---------- input ----------
 const KEYS = {ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',z:'up',w:'up',s:'down',q:'left',a:'left',d:'right'};
 addEventListener('keydown', e=>{
-  if(!drawer.classList.contains('hidden')) return;
+  if(!tdrawer.classList.contains('hidden')) return;
   const k = KEYS[e.key] || KEYS[e.key.toLowerCase?.()];
   if(k){ e.preventDefault(); if(state==='menu'||state==='over') start(); queueDir(k); return; }
   if(e.key===' '||e.key==='p'||e.key==='P'){ e.preventDefault(); if(state==='menu'||state==='over') start(); else togglePause(); }

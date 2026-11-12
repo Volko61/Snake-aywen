@@ -12,7 +12,7 @@ Dépose les images dans `assets/` (PNG carrés, détourés idéalement) :
 | `aywen.png` | La « pomme » |
 | `lemoustique.png`, `margouta.png`, `seiny.png`, `julien.png`, `volko.png` | Confettis de l'équipe |
 
-`.webp` et `.jpg` marchent aussi. Sans image, le jeu affiche des pastilles provisoires. On peut aussi les charger depuis le bouton 🖼️ en jeu (stocké dans le navigateur).
+`.webp` et `.jpg` marchent aussi. Sans image, le jeu affiche des pastilles provisoires.
 
 ## Lancer en local
 
