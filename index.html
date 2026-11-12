@@ -2,7 +2,9 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0d0d0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <title>root@aywen:~$ ./snake</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -12,15 +14,16 @@
     --txt:#f2f2f2; --mut:#8b8b95;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);font-family:'Space Grotesk',system-ui,sans-serif;overflow:hidden}
-  body{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:14px 12px 10px;gap:10px;
+  html,body{margin:0;height:100%;height:100dvh;overscroll-behavior:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;background:var(--bg);color:var(--txt);font-family:'Space Grotesk',system-ui,sans-serif;overflow:hidden}
+  body{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;
+    padding:calc(12px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left));
     background:radial-gradient(1200px 600px at 50% -200px, rgba(210,51,27,.22), transparent 70%), var(--bg)}
   header{width:min(520px,100%);display:flex;align-items:center;justify-content:space-between;gap:10px}
   .brand{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .brand b{color:var(--red2)}
   .brand .cur{display:inline-block;width:7px;height:14px;background:var(--red2);vertical-align:-2px;animation:blink 1s steps(1) infinite}
   @keyframes blink{50%{opacity:0}}
-  .btn{background:var(--panel);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:8px 12px;font:inherit;font-size:14px;cursor:pointer}
+  .btn{touch-action:manipulation;display:inline-flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:8px 12px;font:inherit;font-size:14px;cursor:pointer}
   .btn:hover{border-color:var(--red)}
   .btn.primary{background:var(--red);border-color:var(--red);font-weight:700}
   .stats{width:min(520px,100%);display:flex;gap:8px}
@@ -29,7 +32,9 @@
   .stat span{font-size:22px;font-weight:700}
   .stat .bar{height:4px;background:var(--line);border-radius:4px;margin-top:6px;overflow:hidden}
   .stat .bar i{display:block;height:100%;width:0;background:var(--red);transition:width .2s}
-  .wrap{position:relative;width:min(520px,100%,calc(100vh - 290px));aspect-ratio:1}
+  .wrap{position:relative;width:min(520px,100%,calc(100vh - 150px));width:min(520px,100%,calc(100dvh - 150px));aspect-ratio:1;touch-action:none}
+  @media (pointer:coarse){.wrap{width:min(520px,100%,calc(100dvh - 300px))}}
+  .btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
   canvas#game{width:100%;height:100%;display:block;border-radius:16px;border:1px solid var(--line);background:#111114;touch-action:none}
   .overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;
     background:rgba(13,13,15,.82);backdrop-filter:blur(3px);border-radius:16px;padding:20px}
@@ -38,12 +43,14 @@
   .overlay p{margin:0;color:var(--mut);font-size:14px;max-width:340px}
   .overlay code{font-family:'JetBrains Mono',monospace;color:var(--red2);font-size:13px}
   .hidden{display:none!important}
-  .pad{display:grid;grid-template-columns:repeat(3,56px);grid-template-rows:repeat(2,48px);gap:6px}
-  .pad button{background:var(--panel);border:1px solid var(--line);color:var(--txt);border-radius:12px;font-size:20px}
-  .pad button:active{background:var(--red)}
+  .pad{display:grid;grid-template-columns:repeat(3,64px);grid-template-rows:repeat(2,56px);gap:8px;touch-action:none}
+  .pad button{touch-action:none;-webkit-appearance:none;display:grid;place-items:center;background:var(--panel);border:1px solid var(--line);color:var(--txt);border-radius:12px;font-size:20px}
+  .pad button:active,.pad button.on{background:var(--red);border-color:var(--red)}
+  .pad svg{width:22px;height:22px;fill:currentColor}
   .pad .up{grid-column:2}.pad .left{grid-column:1;grid-row:2}.pad .down{grid-column:2;grid-row:2}.pad .right{grid-column:3;grid-row:2}
   @media (hover:hover) and (pointer:fine){.pad{display:none}}
-  footer{font-size:12px;color:var(--mut);font-family:'JetBrains Mono',monospace}
+  @media (pointer:coarse){.kbd-hint{display:none}} @media (pointer:fine){.touch-hint{display:none}}
+  footer{text-align:center;font-size:12px;color:var(--mut);font-family:'JetBrains Mono',monospace}
   #fx{position:fixed;inset:0;pointer-events:none;z-index:20}
   .toast{position:fixed;left:50%;top:18%;transform:translate(-50%,-10px);z-index:30;background:var(--red);color:#fff;font-weight:700;
     padding:12px 20px;border-radius:14px;font-size:18px;box-shadow:0 10px 40px rgba(210,51,27,.5);opacity:0;transition:.3s;pointer-events:none;text-align:center}
@@ -54,7 +61,7 @@
   .sheet h2{margin:0 0 4px;font-size:20px}
   .sheet p{margin:0 0 14px;color:var(--mut);font-size:13px}
   .slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
-  .slot{display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:8px;cursor:pointer}
+  .slot{touch-action:manipulation;display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:8px;cursor:pointer}
   .slot:hover{border-color:var(--red)}
   .slot canvas{width:44px;height:44px;border-radius:10px;flex:none}
   .slot div{font-size:13px;line-height:1.25}
@@ -63,7 +70,7 @@
   .hbtns{display:flex;gap:6px}
   .trophies{display:grid;grid-template-columns:1fr;gap:8px}
   .tro{display:flex;gap:12px;align-items:center;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px}
-  .tro .ic{font-size:28px;width:44px;height:44px;flex:none;display:grid;place-items:center;border-radius:12px;background:#1f1f25}
+  .tro .ic{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:#fff;width:44px;height:44px;flex:none;display:grid;place-items:center;border-radius:12px;background:#1f1f25}
   .tro.on{border-color:rgba(210,51,27,.6)}
   .tro.on .ic{background:linear-gradient(135deg,#D2331B,#ff8a5c)}
   .tro.gold.on .ic{background:linear-gradient(135deg,#b8860b,#ffd76a)}
@@ -77,22 +84,14 @@
 <body>
 <header>
   <div class="brand"><b>root@aywen</b>:~$ ./snake <span class="cur"></span></div>
-  <div class="hbtns"><button class="btn" id="trophyBtn">🏆 <span id="tcountBtn">0</span></button><button class="btn" id="assetsBtn">🖼️</button></div>
+  <div class="hbtns"><button class="btn" id="trophyBtn" aria-label="Trophées"><svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3"/></svg><span id="tcountBtn">0</span></button><button class="btn" id="assetsBtn" aria-label="Images"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg></button></div>
 </header>
-
-<div class="stats">
-  <div class="stat"><small>Aywen mangés</small><span id="score">0</span>
-    <div class="bar"><i id="prog"></i></div></div>
-  <div class="stat"><small>Record</small><span id="best">0</span></div>
-  <div class="stat"><small>Niveau</small><span id="lvl">1</span></div>
-</div>
 
 <div class="wrap">
   <canvas id="game" width="600" height="600"></canvas>
   <div class="overlay" id="startOv">
     <h1>Snake <em>root</em></h1>
-    <p>Guide Root et mange un max d'Aywen. Tous les <b>10</b>, l'équipe débarque 🎉</p>
-    <p><code>← ↑ → ↓</code> / <code>ZQSD</code> / swipe · <code>Espace</code> pause</p>
+    <p class="kbd-hint"><code>← ↑ → ↓</code> / <code>ZQSD</code> · <code>Espace</code> pause</p><p class="touch-hint"><code>Glisse le doigt ou utilise les flèches</code></p>
     <button class="btn primary" id="playBtn">sudo ./play</button>
   </div>
   <div class="overlay hidden" id="overOv">
@@ -102,18 +101,18 @@
     <button class="btn primary" id="againBtn">↻ Rejouer</button>
   </div>
   <div class="overlay hidden" id="pauseOv">
-    <h1>⏸ Pause</h1><p><code>process suspended</code> — Espace pour reprendre</p>
+    <h1>Pause</h1><p><code>process suspended</code></p><button class="btn primary" id="resumeBtn">Reprendre</button>
   </div>
 </div>
 
 <div class="pad">
-  <button class="up" data-d="up">▲</button>
-  <button class="left" data-d="left">◀</button>
-  <button class="down" data-d="down">▼</button>
-  <button class="right" data-d="right">▶</button>
+  <button class="up" data-d="up" aria-label="up"><svg viewBox="0 0 24 24"><path d="M12 5l8 12H4z"/></svg></button>
+  <button class="left" data-d="left" aria-label="left"><svg viewBox="0 0 24 24"><path d="M5 12l12-8v16z"/></svg></button>
+  <button class="down" data-d="down" aria-label="down"><svg viewBox="0 0 24 24"><path d="M12 19L4 7h16z"/></svg></button>
+  <button class="right" data-d="right" aria-label="right"><svg viewBox="0 0 24 24"><path d="M19 12L7 4v16z"/></svg></button>
 </div>
 
-<footer>Codé avec 🫶🏻 pour Aywen</footer>
+<footer>Codé avec &#9829;&#xFE0E; pour la commu, vous êtes les bests</footer>
 
 <canvas id="fx"></canvas>
 <div class="toast" id="toast"></div>
@@ -121,7 +120,7 @@
 
 <div class="drawer hidden" id="tdrawer">
   <div class="sheet">
-    <h2>🏆 Trophées <span class="tcount" id="tcount"></span></h2>
+    <h2>Trophées <span class="tcount" id="tcount"></span></h2>
     <p>Certains objets rares apparaissent sur le plateau quelques secondes. Ouvre l'œil.</p>
     <div class="trophies" id="tlist"></div>
     <div class="row">
@@ -192,8 +191,8 @@ function rr(g,x,y,w,h,r){ g.beginPath(); g.moveTo(x+r,y); g.arcTo(x+w,y,x+w,y+h,
 function loadImg(src){ return new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=src; }); }
 
 async function initAssets(){
+  for(const a of ASSETS) imgs[a.id] = placeholder(a);
   for(const a of ASSETS){
-    imgs[a.id] = placeholder(a);
     const saved = store.get('snakeroot_'+a.id);
     if(saved){ try{ imgs[a.id] = await loadImg(saved); continue; }catch(e){} }
     for(const ext of ['png','webp','jpg']){
@@ -242,20 +241,20 @@ document.getElementById('resetAssets').onclick = async () => { ASSETS.forEach(a=
 
 // ---------- trophées ----------
 const TROPHIES = [
-  {id:'first',   ic:'🍎', name:'Premier Aywen',            desc:'Manger ton tout premier Aywen.'},
-  {id:'team',    ic:'🎉', name:'L\'équipe au complet',      desc:'Atteindre 10 Aywen et faire débarquer toute l\'équipe.'},
-  {id:'bd',      ic:'✏️', name:'La BD faite main',          desc:'Récupérer une page de la fameuse BD dessinée à la main par Aywen.'},
-  {id:'bdfull',  ic:'📖', name:'Intégrale collector',       desc:'Récupérer 3 pages de la BD dans la même partie.'},
-  {id:'commu',   ic:'🥇', name:'Une commu en or',           desc:'Manger l\'Aywen en or. La commu vaut de l\'or, littéralement (+5).', gold:true},
-  {id:'sosie',   ic:'🕵️', name:'Micode ? Hugo Décrypte ?',  desc:'Attraper le sosie. Attends… c\'est qui lui ? Ah non, c\'est Aywen.'},
-  {id:'robux',   ic:'🪙', name:'Riche en Robux',            desc:'Ramasser une pièce R$.'},
-  {id:'obby',    ic:'🧗', name:'Obby terminé',              desc:'Atteindre 30 Aywen sans tomber dans le vide.'},
-  {id:'oof',     ic:'💀', name:'Oof',                       desc:'Mourir sans avoir mangé un seul Aywen. Le bruitage est dans ta tête.'},
-  {id:'ouro',    ic:'🐍', name:'Ouroboros',                 desc:'Te mordre la queue. Root a un bug de récursion.'},
-  {id:'fuze',    ic:'⚡', name:'Mode Fuze',                 desc:'Atteindre la vitesse maximale.'},
-  {id:'golden',  ic:'👑', name:'Commu légendaire',          desc:'Atteindre 50 Aywen.', gold:true},
-  {id:'grind',   ic:'🔁', name:'Grind de vidéo',            desc:'Lancer 10 parties.'},
-  {id:'konami',  ic:'🕹️', name:'sudo confetti',             desc:'Trouver le code secret (indice : ↑↑↓↓…).'},
+  {id:'first',   ic:'1', name:'Premier Aywen',            desc:'Manger ton tout premier Aywen.'},
+  {id:'team',    ic:'x10', name:'L\'équipe au complet',      desc:'Atteindre 10 Aywen et faire débarquer toute l\'équipe.'},
+  {id:'bd',      ic:'BD', name:'La BD faite main',          desc:'Récupérer une page de la fameuse BD dessinée à la main par Aywen.'},
+  {id:'bdfull',  ic:'BD3', name:'Intégrale collector',       desc:'Récupérer 3 pages de la BD dans la même partie.'},
+  {id:'commu',   ic:'OR', name:'Une commu en or',           desc:'Manger l\'Aywen en or. La commu vaut de l\'or, littéralement (+5).', gold:true},
+  {id:'sosie',   ic:'?', name:'Micode ? Hugo Décrypte ?',  desc:'Attraper le sosie. Attends… c\'est qui lui ? Ah non, c\'est Aywen.'},
+  {id:'robux',   ic:'R$', name:'Riche en Robux',            desc:'Ramasser une pièce R$.'},
+  {id:'obby',    ic:'30', name:'Obby terminé',              desc:'Atteindre 30 Aywen sans tomber dans le vide.'},
+  {id:'oof',     ic:'OOF', name:'Oof',                       desc:'Mourir sans avoir mangé un seul Aywen. Le bruitage est dans ta tête.'},
+  {id:'ouro',    ic:'∞', name:'Ouroboros',                 desc:'Te mordre la queue. Root a un bug de récursion.'},
+  {id:'fuze',    ic:'MAX', name:'Mode Fuze',                 desc:'Atteindre la vitesse maximale.'},
+  {id:'golden',  ic:'50', name:'Commu légendaire',          desc:'Atteindre 50 Aywen.', gold:true},
+  {id:'grind',   ic:'10', name:'Grind de vidéo',            desc:'Lancer 10 parties.'},
+  {id:'konami',  ic:'↑↑↓↓', name:'sudo confetti',             desc:'Trouver le code secret (indice : haut, haut, bas, bas…).'},
 ];
 let unlocked = {};
 try{ unlocked = JSON.parse(store.get('snakeroot_trophies')||'{}') || {}; }catch(e){ unlocked = {}; }
@@ -270,7 +269,7 @@ function unlock(id){
 function nextTrophyToast(){
   if(tBusy || !tQueue.length) return;
   tBusy = true; const t = tQueue.shift(); const el = $('ttoast');
-  el.innerHTML = `${t.ic} Trophée débloqué : ${t.name}<small>${t.desc}</small>`;
+  el.innerHTML = `Trophée débloqué : ${t.name}<small>${t.desc}</small>`;
   el.classList.add('show');
   setTimeout(()=>{ el.classList.remove('show'); setTimeout(()=>{ tBusy=false; nextTrophyToast(); }, 350); }, 2600);
 }
@@ -291,7 +290,7 @@ const ITEM_TYPES = [
   {type:'bd',    w:4, pts:2, msg:['Une page de la BD faite main !','Le trait est… authentique.','Chef-d\'œuvre au stylo bille']},
   {type:'robux', w:3, pts:2, msg:['+R$ 2','Robux farmés','Oof… non, gagné !']},
   {type:'sosie', w:2, pts:3, msg:['Micode ?? Ah non.','Hugo Décrypte ?? Non plus.','Sosie démasqué']},
-  {type:'gold',  w:1, pts:5, msg:['Une commu en or 🥇']},
+  {type:'gold',  w:1, pts:5, msg:['Une commu en or !']},
 ];
 let item = null, bdPages = 0, tickCount = 0;
 function maybeSpawnItem(){
@@ -340,8 +339,8 @@ function drawItem(){
     ctx.globalCompositeOperation='color'; ctx.fillStyle='#d4a017'; ctx.fillRect(-r,-r,r*2,r*2); ctx.restore();
     ctx.strokeStyle='#fff3c4'; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(0,0,r,0,Math.PI*2); ctx.stroke();
     // étincelles
-    for(let i=0;i<4;i++){ const a=t*2+i*Math.PI/2, d=r*1.25; ctx.fillStyle='#fff6d0';
-      ctx.font=`${Math.round(CELL*0.45)}px sans-serif`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('✦',Math.cos(a)*d,Math.sin(a)*d); }
+    for(let i=0;i<4;i++){ const a=t*2+i*Math.PI/2, d=r*1.25, k=CELL*0.14, x=Math.cos(a)*d, y=Math.sin(a)*d; ctx.fillStyle='#fff6d0';
+      ctx.beginPath(); ctx.moveTo(x,y-k); ctx.lineTo(x+k*0.5,y); ctx.lineTo(x,y+k); ctx.lineTo(x-k*0.5,y); ctx.closePath(); ctx.fill(); }
   } else if(item.def.type==='sosie'){
     const r = s*0.5;
     ctx.beginPath(); ctx.arc(0,0,r,0,Math.PI*2); ctx.fillStyle='#333'; ctx.fill();
@@ -363,7 +362,6 @@ function drawItem(){
 const cv = document.getElementById('game'), ctx = cv.getContext('2d');
 const N = 20; let CELL = cv.width / N;
 let snake, dir, nextDirs, food, score, best = +(store.get('snakeroot_best')||0), state = 'menu', tickMs, acc = 0, last = 0, pops = [], eatAnim = 0;
-$('best').textContent = best;
 
 const DIRS = {up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]};
 const OPP = {up:'down',down:'up',left:'right',right:'left'};
@@ -379,11 +377,7 @@ function placeFood(){
   while(snake.some(s=>s.x===p.x&&s.y===p.y));
   food = p;
 }
-function updateHud(){
-  $('score').textContent = score;
-  $('lvl').textContent = 1 + Math.floor(score/10);
-  $('prog').style.width = ((score%10)*10) + '%';
-}
+function updateHud(){}
 function queueDir(d){
   if(state==='menu'||state==='over') return;
   const lastD = nextDirs.length ? nextDirs[nextDirs.length-1] : dir;
@@ -450,10 +444,10 @@ function gameOver(reason){
   if(gamesPlayed>=10) unlock('grind');
   if(score===0) unlock('oof');
   if(reason==='self') unlock('ouro');
-  if(score > best){ best = score; store.set('snakeroot_best', best); $('best').textContent = best; }
-  $('overTitle').innerHTML = score>=best && score>0 ? 'Nouveau <em style="color:var(--red2);font-style:normal">record</em> !' : 'Game over';
-  $('overMsg').textContent = score===0 ? 'Oof. 💀' : reason==='self' ? 'Root s\'est mordu la queue. Récursion infinie.' : DEATH[Math.floor(Math.random()*DEATH.length)];
-  $('overScore').textContent = `exit code ${score} · ${score} Aywen mangé${score>1?'s':''}`;
+  const isRecord = score > best && score > 0; if(score > best){ best = score; store.set('snakeroot_best', best); }
+  $('overTitle').innerHTML = isRecord ? 'Nouveau <em style="color:var(--red2);font-style:normal">record</em> !' : 'Game over';
+  $('overMsg').textContent = score===0 ? 'Oof.' : reason==='self' ? 'Root s\'est mordu la queue. Récursion infinie.' : DEATH[Math.floor(Math.random()*DEATH.length)];
+  $('overScore').textContent = `${score} Aywen mangé${score>1?'s':''} · record ${best}`;
   $('overOv').classList.remove('hidden');
   shake = 10;
 }
@@ -536,7 +530,7 @@ function sizeFx(){ fx.width = innerWidth*devicePixelRatio; fx.height = innerHeig
 addEventListener('resize', sizeFx); sizeFx();
 function teamEvent(){
   const names = TEAM.map(t=>t.label).join(', ');
-  toast(`🎉 ${score} Aywen ! L'équipe débarque<br><small style="font-weight:500;font-size:13px">${names}</small>`);
+  toast(`${score} Aywen ! L'équipe débarque<br><small style="font-weight:500;font-size:13px">${names}</small>`);
   const W = fx.width, D = devicePixelRatio;
   for(let i=0;i<70;i++){
     const isPP = i < 35;
@@ -598,22 +592,31 @@ addEventListener('keydown', e=>{
   if(e.key==='Enter' && (state==='menu'||state==='over')) start();
 });
 let ts = null;
-cv.addEventListener('touchstart', e=>{ ts = {x:e.touches[0].clientX, y:e.touches[0].clientY}; }, {passive:true});
-cv.addEventListener('touchmove', e=>{
-  if(!ts) return; e.preventDefault();
+const wrapEl = document.querySelector('.wrap');
+wrapEl.addEventListener('touchstart', e=>{ ts = {x:e.touches[0].clientX, y:e.touches[0].clientY}; }, {passive:true});
+wrapEl.addEventListener('touchend', ()=>{ ts = null; }, {passive:true});
+wrapEl.addEventListener('touchmove', e=>{
+  if(!ts || state!=='play') return; e.preventDefault();
   const dx = e.touches[0].clientX-ts.x, dy = e.touches[0].clientY-ts.y;
   if(Math.max(Math.abs(dx),Math.abs(dy)) > 24){
     queueDir(Math.abs(dx)>Math.abs(dy) ? (dx>0?'right':'left') : (dy>0?'down':'up'));
     ts = {x:e.touches[0].clientX, y:e.touches[0].clientY};
   }
 }, {passive:false});
-document.querySelectorAll('.pad button').forEach(b=>b.addEventListener('pointerdown', e=>{ e.preventDefault(); if(state==='menu'||state==='over') start(); queueDir(b.dataset.d); }));
+document.querySelectorAll('.pad button').forEach(b=>{
+  b.addEventListener('pointerdown', e=>{ e.preventDefault(); b.classList.add('on'); if(state==='menu'||state==='over') start(); else if(state==='pause') togglePause(false); queueDir(b.dataset.d); });
+  ['pointerup','pointercancel','pointerleave'].forEach(ev=>b.addEventListener(ev, ()=>b.classList.remove('on')));
+  b.addEventListener('contextmenu', e=>e.preventDefault());
+});
+$('resumeBtn').onclick = () => togglePause(false);
+document.addEventListener('gesturestart', e=>e.preventDefault());
+document.addEventListener('dblclick', e=>e.preventDefault(), {passive:false});
 $('playBtn').onclick = start; $('againBtn').onclick = start;
 document.addEventListener('visibilitychange', ()=>{ if(document.hidden && state==='play') togglePause(true); });
 
 // konami → pluie de l'équipe
 const KON = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a']; let ki = 0;
-addEventListener('keydown', e=>{ ki = (e.key===KON[ki]) ? ki+1 : (e.key===KON[0]?1:0); if(ki===KON.length){ ki=0; teamEvent(); toast('🕹️ Konami code — sudo confetti'); unlock('konami'); } });
+addEventListener('keydown', e=>{ ki = (e.key===KON[ki]) ? ki+1 : (e.key===KON[0]?1:0); if(ki===KON.length){ ki=0; teamEvent(); toast('Konami code : sudo confetti'); unlock('konami'); } });
 
 reset(); renderTrophies(); initAssets().then(draw);
 requestAnimationFrame(loop);
