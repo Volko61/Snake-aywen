@@ -4,7 +4,7 @@ Snake avec Root en tête et Aywen à la place des pommes. Tous les 10 Aywen, l'�
 
 ## Images
 
-Dépose les images dans `assets/` (PNG carrés, détourés idéalement) :
+Dépose les images dans `snake/assets/` (PNG carrés, détourés idéalement) :
 
 | Fichier | Rôle |
 |---|---|
@@ -19,7 +19,7 @@ Dépose les images dans `assets/` (PNG carrés, détourés idéalement) :
 ```bash
 docker build -t snake-root . && docker run -p 8080:80 snake-root
 ```
-puis http://localhost:8080 — ou ouvre simplement `index.html`.
+puis http://localhost:8080 (le Snake est sur http://localhost:8080/snake/).
 
 ## Déployer sur Dokploy
 
@@ -30,6 +30,7 @@ puis http://localhost:8080 — ou ouvre simplement `index.html`.
 5. Onglet **Domains** → ajoute ton domaine, **Container Port : 80**, active HTTPS (Let's Encrypt).
 6. Optionnel : active **Autodeploy** pour redéployer à chaque push.
 
-## Page tuto
+## Organisation du site
 
-`/tuto/` : petite page « Merci d'avoir été jusque là ! » qui explique comment faire apparaître le jeu caché d'aywen.fr (décoller la carte Discord, puis cliquer sur Jouer). C'est le lien à mettre à la fin du jeu. Police Departure Mono (licence OFL) dans `tuto/fonts/`.
+- `/` (`index.html`) : petite page « Merci d'avoir été jusque là ! » qui explique comment faire apparaître le jeu caché d'aywen.fr (décoller la carte Discord, puis cliquer sur Jouer). Images dans `img/`, police Departure Mono (licence OFL) dans `fonts/`.
+- `/snake/` : le Snake (`snake/index.html`, images dans `snake/assets/`).
