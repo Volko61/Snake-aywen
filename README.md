@@ -32,4 +32,4 @@ puis http://localhost:8080 — ou ouvre simplement `index.html`.
 
 ## Page tuto
 
-`/tuto/` : page « petit secret » aux couleurs d'aywen.fr (démo animée jouée par un bot, commandes, objets rares, captures, trophées du joueur lus depuis le localStorage, lien Discord). C'est le lien à mettre sur aywen.fr à la fin du jeu. Police Departure Mono (licence OFL) dans `tuto/fonts/`.
+`/tuto/` : guide de survie de **Root vs Zombies**, le jeu caché d'aywen.fr (lien à mettre à la fin du jeu). Démo animée avec les vrais sprites du jeu, comment lancer une partie, commandes, arsenal, bestiaire, captures, astuces, lien Discord. Sprites dans `tuto/img/game/` (repris d'aywen.fr), police Departure Mono (licence OFL) dans `tuto/fonts/`.
