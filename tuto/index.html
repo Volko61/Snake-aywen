@@ -3,78 +3,641 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#f4f1ea">
-<title>secret.txt - Bloc-notes</title>
+<meta name="theme-color" content="#eceef1">
+<meta name="color-scheme" content="light">
+<title>Un petit secret · ./snake</title>
+<meta name="description" content="Merci d'avoir été jusque là ! Voici un petit secret : un Snake caché, avec Root en tête et Aywen à la place des pommes.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="preload" href="fonts/DepartureMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <style>
-  :root{ --paper:#fbfaf6; --bg:#ecebe6; --ink:#1c1c1c; --mut:#8a877f; --line:#d9d6cd; --red:#D2331B; }
-  *{box-sizing:border-box}
-  html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);
-    font-family:'JetBrains Mono',ui-monospace,Consolas,monospace;font-size:15px;line-height:1.7}
-  body{display:flex;justify-content:center;padding:24px 16px}
-  .win{width:100%;max-width:680px;background:var(--paper);border:1px solid var(--line);box-shadow:0 1px 0 rgba(0,0,0,.04),0 12px 30px rgba(0,0,0,.06)}
-  .bar{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;border-bottom:1px solid var(--line);font-size:12px;color:var(--mut)}
-  .bar i{font-style:normal;letter-spacing:6px}
-  .menu{padding:3px 12px;border-bottom:1px solid var(--line);font-size:12px;color:var(--mut);word-spacing:10px}
-  pre{margin:0;padding:20px 22px 28px;white-space:pre-wrap;word-wrap:break-word;font:inherit}
-  a{color:var(--red);font-weight:700}
-  b{font-weight:700}
-  .cur{display:inline-block;width:8px;height:1.1em;background:var(--ink);vertical-align:-3px;animation:blink 1s steps(1) infinite}
-  @keyframes blink{50%{opacity:0}}
-  .status{display:flex;justify-content:space-between;padding:3px 12px;border-top:1px solid var(--line);font-size:11px;color:var(--mut)}
-  @media (max-width:420px){ html,body{font-size:13.5px} pre{padding:16px 14px 22px} }
-  @media (prefers-color-scheme:dark){
-    :root{ --paper:#1b1b1f; --bg:#111114; --ink:#e9e7e1; --mut:#7d7b75; --line:#2b2b31; --red:#ff5a3c; }
-  }
+@font-face{font-family:departure;src:url(fonts/DepartureMono-Regular.woff2) format("woff2");font-display:swap}
+:root{
+  --paper:#eceef1; --ink:#333; --ink-soft:#444; --carbon:#222; --kraft:#d6c9b0; --hl:#ccc; --accent:#ffa133;
+  --card-dark:#464646; --screen:#d3d3d3; --lav1:#b3b6e4; --lav2:#a4a8dc; --lav3:#979bd3;
+  --mono:departure, ui-monospace, "SF Mono", Menlo, monospace;
+  --sans:"Inter Tight","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --noise:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+*{box-sizing:border-box}
+html{background:var(--paper);scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink-soft);font-family:var(--mono);font-size:16px;line-height:1.45;
+  -webkit-font-smoothing:none;overflow-x:clip;padding:0 16px calc(16px + env(safe-area-inset-bottom))}
+a{color:inherit}
+.sans{font-family:var(--sans);-webkit-font-smoothing:antialiased}
+.label{display:inline-block;background:var(--ink);color:var(--paper);text-transform:uppercase;font-size:13.75px;line-height:18px;padding:2px 8px;letter-spacing:.02em}
+.label.light{background:var(--paper);color:var(--ink)}
+.caps{text-transform:uppercase;font-size:11.5px;letter-spacing:.1em}
+
+/* ---------- nav ---------- */
+nav{max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:22px;padding:14px 0;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:12px;text-decoration:none}
+.logo svg{width:26px;height:26px}
+.logo b{font-weight:400;background:var(--hl);color:var(--ink);font-size:21px;letter-spacing:.08em;padding:2px 8px;line-height:1.25}
+.logo b i{font-style:normal;animation:blink 1s steps(1) infinite}
+nav .links{display:flex;gap:20px;flex-wrap:wrap}
+nav .links a{font-family:var(--sans);-webkit-font-smoothing:antialiased;text-decoration:none;color:var(--ink);font-size:16px;display:inline-flex;align-items:center;gap:8px}
+nav .links a:hover{text-decoration:underline;text-underline-offset:4px}
+nav .links svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.5}
+nav .rec{margin-left:auto;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink)}
+@keyframes blink{50%{opacity:0}}
+
+/* ---------- grid ---------- */
+main{max-width:1400px;margin:0 auto;display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
+.card{position:relative;overflow:hidden;min-width:0}
+.c-hero{grid-column:span 5;grid-row:span 2}
+.c-demo{grid-column:span 7}
+.c-keys{grid-column:span 4}
+.c-rules{grid-column:span 3}
+.c-items{grid-column:span 5}
+.c-gal{grid-column:span 4}
+.c-disc{grid-column:span 3}
+.c-tro{grid-column:span 12}
+@media (max-width:1100px){
+  .c-hero,.c-demo{grid-column:span 12;grid-row:auto}
+  .c-keys,.c-rules{grid-column:span 6}
+  .c-items,.c-gal{grid-column:span 6}
+  .c-disc{grid-column:span 12}
+}
+@media (max-width:720px){ main>.card{grid-column:span 12 !important} body{font-size:15px} nav{gap:12px 18px} nav .links a:not(:first-child){display:none} nav .rec{margin-left:0;width:100%} }
+
+/* reveal */
+.rv{opacity:0;transform:translateY(24px) rotate(var(--rot,0deg));transition:opacity .6s ease,transform .7s cubic-bezier(.2,.9,.25,1.2)}
+.rv.in{opacity:1;transform:none}
+
+/* ---------- keyboard button (site style) ---------- */
+.keybtn{-webkit-tap-highlight-color:transparent;user-select:none;background:linear-gradient(#111 0%,#1e1e1e 50%,#2e2e2e 100%);border-radius:6px;padding:1px 2px 2px;display:inline-flex;position:relative;box-shadow:0 -1px #0000001f,0 1px #ffffff8c;text-decoration:none;border:0;cursor:pointer;font:inherit}
+.keybtn-cap{height:44px;color:var(--ink);background:linear-gradient(#f9f8f5 0%,#f2f1ec 70%,#eae9e3 100%);border-radius:5px;align-items:center;padding:0 20px 5px;transition:padding 50ms ease-out;display:flex;font-family:var(--sans);-webkit-font-smoothing:antialiased;font-weight:700;font-size:13.5px;letter-spacing:.04em;text-transform:uppercase;gap:8px;
+  box-shadow:inset 0 1px #fff,inset 1px 0 #ffffffb3,inset -1px 0 #0000000a,inset 0 -1px #94928a,inset 0 -2px #adaba2,inset 0 -3px #bfbdb4,inset 0 -5px #cfcdc4,inset 0 -6px 1px #0000001a}
+.keybtn:hover .keybtn-cap{padding:2px 20px 3px;box-shadow:inset 0 1px #111,inset 1px 0 #ffffffb3,inset -1px 0 #0000000a,inset 0 -1px #94928a,inset 0 -2px #b6b4ab,inset 0 -3px #cfcdc4,inset 0 -4px #e2e0d8}
+.keybtn:active .keybtn-cap{padding:4px 20px 1px;box-shadow:inset 0 2px #111,inset 1px 0 #ffffffb3,inset 0 -1px #bdbbb2,inset 0 -2px #d6d4cc}
+.keybtn:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.keybtn.big .keybtn-cap{height:54px;font-size:16px;padding:0 30px 5px}
+.keybtn.big:hover .keybtn-cap{padding:2px 30px 3px}
+.keybtn.big:active .keybtn-cap{padding:4px 30px 1px}
+
+/* screws */
+.screw{position:absolute;width:10px;height:10px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#bdbdbd,#8a8a8a);box-shadow:inset 0 0 0 1px #777}
+.screw.tl{top:8px;left:8px}.screw.tr{top:8px;right:8px}.screw.bl{bottom:8px;left:8px}.screw.br{bottom:8px;right:8px}
+
+/* ---------- HERO (badge) ---------- */
+.c-hero{background:var(--card-dark);color:#eee;padding:14px 14px 18px;display:flex;flex-direction:column}
+.c-hero::after{content:"";position:absolute;inset:0;background:var(--noise);opacity:.18;pointer-events:none;mix-blend-mode:overlay}
+.slot{width:72px;height:9px;border-radius:9px;background:#e9e9e9;margin:4px auto 14px;box-shadow:inset 0 2px 2px #0005}
+.hero-top{background:#2c2c2c;padding:22px 20px 20px;position:relative}
+.hero-top .label{background:var(--paper);color:var(--ink)}
+.typed{font-size:clamp(28px,3.4vw,44px);line-height:1.12;color:#fff;margin:16px 0 10px;letter-spacing:-.01em;min-height:2.3em}
+.typed2{font-size:clamp(16px,1.5vw,19px);color:#cfcfcf;min-height:1.5em;margin:0}
+.caret{display:inline-block;width:.55em;height:1em;background:var(--accent);vertical-align:-.12em;margin-left:2px;animation:blink 1s steps(1) infinite}
+.hero-stats{display:flex;justify-content:center;gap:10px;margin-top:16px;text-align:center;flex-wrap:wrap}
+.hero-stats div{flex:1;min-width:120px;border:1px dashed #6a6a6a;padding:8px 6px}
+.hero-stats b{display:block;font-weight:400;font-size:26px;color:#fff}
+.hero-stats small{color:#aaa}
+
+/* secret folder */
+.secret{position:relative;flex:1;margin-top:14px;min-height:330px;perspective:1200px;display:flex}
+.folder{position:absolute;inset:0;background:var(--kraft);border-radius:2px;overflow:hidden;cursor:pointer;
+  box-shadow:0 1px 0 #0003, inset 0 0 0 1px #0000000d;transform-origin:top center;transition:transform .9s cubic-bezier(.6,0,.2,1),opacity .5s .5s}
+.folder::before{content:"";position:absolute;inset:0;background:var(--noise);opacity:.35;mix-blend-mode:multiply}
+.folder::after{content:"";position:absolute;left:0;right:0;top:0;height:28px;background:linear-gradient(#c4b598,#cdbfa4);clip-path:polygon(0 0,38% 0,42% 100%,0 100%)}
+.folder .stamp{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%) rotate(-8deg);border:3px solid var(--ink);color:var(--ink);padding:8px 16px;font-size:clamp(22px,2.4vw,32px);letter-spacing:.12em;text-transform:uppercase;opacity:.82;white-space:nowrap}
+.folder .stamp small{display:block;font-size:12px;letter-spacing:.2em;text-align:center}
+.folder .hint{position:absolute;left:0;right:0;bottom:18px;text-align:center;color:var(--ink);font-size:13px;letter-spacing:.12em;text-transform:uppercase;animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.35}}
+.tape{position:absolute;height:44px;background:linear-gradient(180deg,#e7d6a9e6,#d9c48fe6);box-shadow:0 1px 2px #0002;
+  clip-path:polygon(0 8%,3% 0,6% 10%,9% 0,12% 6%,15% 0,100% 0,97% 10%,100% 22%,97% 34%,100% 46%,97% 58%,100% 70%,97% 82%,100% 94%,94% 100%,0 100%,3% 88%,0 76%,3% 64%,0 52%,3% 40%,0 28%,3% 18%);
+  transition:transform .55s cubic-bezier(.5,-0.4,.7,1),opacity .4s .2s}
+.tape::after{content:"";position:absolute;inset:0;background:var(--noise);opacity:.25;mix-blend-mode:multiply}
+.tape.t1{width:78%;left:-6%;top:22%;transform:rotate(-14deg)}
+.tape.t2{width:70%;right:-8%;bottom:22%;transform:rotate(11deg)}
+.folder:hover .tape.t1{transform:rotate(-16deg) translateY(-3px)}
+.secret.open .tape.t1{transform:rotate(-40deg) translate(-60%,-180%);opacity:0}
+.secret.open .tape.t2{transform:rotate(35deg) translate(60%,180%);opacity:0}
+.secret.open .folder{transform:rotateX(-100deg);opacity:0;pointer-events:none;transition-delay:.35s,.9s}
+.inside{position:relative;flex:1;background:#f7f6f2;color:var(--ink);padding:18px;display:flex;flex-direction:column;gap:12px;overflow:hidden}
+.inside::before{content:"";position:absolute;inset:0;background:var(--noise);opacity:.18;pointer-events:none}
+.inside .cmd{font-size:clamp(18px,1.8vw,24px);color:var(--ink)}
+.inside .cmd span{color:#999}
+.inside p{margin:0;color:var(--ink-soft)}
+.polaroid{position:relative;align-self:center;margin:6px 0;width:min(210px,56%);background:#fff;padding:8px 8px 26px;box-shadow:0 8px 24px #0003;transform:rotate(3deg) translateY(30px);opacity:0;transition:transform .8s cubic-bezier(.2,1.4,.4,1) 1s,opacity .4s 1s}
+.polaroid img{display:block;width:100%;height:auto;aspect-ratio:1;object-fit:cover}
+.polaroid figcaption{position:absolute;left:0;right:0;bottom:4px;text-align:center;font-size:12px;color:#666}
+.secret.open .polaroid{transform:rotate(3deg);opacity:1}
+.inside .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:auto;position:relative}
+
+/* ---------- DEMO (screen) ---------- */
+.c-demo{background:var(--screen);border-radius:14px;padding:26px 24px 22px;box-shadow:inset 0 0 0 1px #0000001a,inset 0 2px 0 #fff8;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.9fr);gap:22px;align-items:center}
+.c-demo .head{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.live{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;letter-spacing:.1em;color:var(--ink)}
+.live i{width:9px;height:9px;border-radius:50%;background:#e33;box-shadow:0 0 0 3px #e333;animation:pulse 1.2s infinite}
+.tv{position:relative;background:#111114;border-radius:6px;box-shadow:0 0 0 6px #2b2b2b,0 0 0 7px #0003,0 10px 20px #0003;aspect-ratio:1;overflow:hidden}
+.tv canvas{width:100%;height:100%;display:block}
+.tv::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,#0000 0 2px,#00000022 2px 3px);mix-blend-mode:multiply}
+.tv .score{position:absolute;left:10px;top:8px;color:#fff;font-size:13px;letter-spacing:.08em;text-shadow:0 1px 2px #000;z-index:2}
+.tv .score b{color:var(--accent);font-weight:400}
+.tv .bot{position:absolute;right:10px;top:8px;color:#888;font-size:11px;letter-spacing:.1em;z-index:2}
+.demo-txt h2{font-weight:400;font-size:clamp(28px,3vw,44px);line-height:1.05;color:var(--ink);margin:0 0 12px;letter-spacing:-.02em}
+.demo-txt h2 em{font-style:normal;background:var(--ink);color:var(--paper);padding:0 6px}
+.demo-txt p{margin:0 0 16px;color:var(--ink-soft)}
+.demo-txt .meta{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#777;margin-top:14px}
+@media (max-width:720px){.c-demo{grid-template-columns:1fr;padding:22px 16px 18px}}
+
+/* ---------- KEYS (perforated notebook) ---------- */
+.c-keys{background:#fff;padding:20px 22px 20px 52px}
+.c-keys::before,.c-keys::after{content:"";position:absolute;top:0;bottom:0;width:30px;background:radial-gradient(circle,var(--paper) 4.5px,#0000 5px) 50% 8px/30px 26px repeat-y}
+.c-keys::before{left:0;border-right:1px solid #e3e3e3}
+.c-keys::after{right:0;display:none}
+.keys-wrap{display:flex;gap:26px;justify-content:center;flex-wrap:wrap;margin:22px 0 14px}
+.kgrid{display:grid;grid-template-columns:repeat(3,44px);grid-template-rows:44px 44px;gap:6px}
+.kgrid .k:nth-child(1){grid-column:2;grid-row:1}.kgrid .k:nth-child(2){grid-column:1;grid-row:2}.kgrid .k:nth-child(3){grid-column:2;grid-row:2}.kgrid .k:nth-child(4){grid-column:3;grid-row:2}
+@media (max-width:480px){.kgrid{grid-template-columns:repeat(3,36px);grid-template-rows:36px 36px;gap:5px}.keys-wrap{gap:18px}.keycap{font-size:15px}.c-keys{padding-left:46px;padding-right:16px}}
+.keycap{color:var(--ink);user-select:none;background:#f6f6f6;border-radius:6px;display:flex;justify-content:center;align-items:center;font-size:17px;
+  transition:transform 60ms linear,box-shadow 60ms linear,background .1s;box-shadow:inset 0 0 0 1px silver,inset 0 -4px #e0e0e0,0 3px #8e8e8e;cursor:pointer}
+.keycap:hover,.keycap[data-active=true]{transform:translateY(2px);box-shadow:inset 0 0 0 1px silver,inset 0 -2px #e0e0e0,0 1px #8e8e8e}
+.keycap[data-active=true]{background:#ffe2bf}
+.space{width:min(100%,246px);height:44px;margin:0 auto;font-size:12px;letter-spacing:.14em;text-transform:uppercase}
+.kcap{display:flex;justify-content:space-between;color:#888;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;margin-top:6px}
+.swipe{display:flex;align-items:center;gap:14px;margin-top:18px;padding-top:14px;border-top:1px dashed #ccc;color:var(--ink-soft);font-size:14px}
+.phone{flex:none;width:44px;height:72px;border:2px solid var(--ink);border-radius:9px;position:relative;overflow:hidden;background:#fafafa}
+.phone::before{content:"";position:absolute;top:4px;left:50%;width:12px;height:3px;margin-left:-6px;background:var(--ink);border-radius:3px}
+.phone i{position:absolute;width:12px;height:12px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px #ffa13355;animation:swipe 3.2s ease-in-out infinite}
+@keyframes swipe{0%{left:6px;top:40px;opacity:0}10%{opacity:1}30%{left:26px;top:40px}35%{opacity:1}45%{left:26px;top:40px;opacity:0}50%{left:16px;top:52px;opacity:0}60%{opacity:1}80%{left:16px;top:18px}90%,100%{opacity:0;left:16px;top:18px}}
+
+/* ---------- RULES (kraft + paperclip) ---------- */
+.c-rules{background:var(--kraft);padding:20px 20px 22px;color:var(--ink)}
+.c-rules::before{content:"";position:absolute;inset:0;background:var(--noise);opacity:.3;mix-blend-mode:multiply;pointer-events:none}
+.clip{position:absolute;right:26px;top:-8px;width:22px;height:64px;transform:rotate(6deg)}
+.rules{list-style:none;margin:18px 0 0;padding:0;display:flex;flex-direction:column;gap:12px;position:relative}
+.rules li{display:grid;grid-template-columns:34px 1fr;gap:8px;align-items:start;font-size:15px}
+.rules li b{font-weight:400;font-size:22px;line-height:1;color:var(--ink)}
+.rules li span{color:var(--ink-soft)}
+
+/* ---------- ITEMS (cardboard) ---------- */
+.c-items{background:#bfa47f;color:var(--ink);padding:22px;min-height:360px;display:flex;flex-direction:column;align-items:flex-start}
+.c-items .items{width:100%}
+.c-items .items-note{margin-top:auto;padding-top:22px}
+.c-items::before{content:"";position:absolute;inset:0;background:
+  repeating-linear-gradient(90deg,#0000 0 9px,#00000010 9px 11px),var(--noise);opacity:.9;mix-blend-mode:multiply;pointer-events:none}
+.c-items .torn{position:absolute;left:0;top:0;bottom:0;width:16px;background:#a88d68;clip-path:polygon(0 0,100% 0,60% 4%,100% 8%,50% 13%,90% 18%,40% 24%,100% 30%,55% 36%,85% 42%,45% 49%,100% 55%,60% 61%,90% 67%,40% 73%,95% 80%,55% 86%,85% 93%,50% 100%,0 100%)}
+.big-tape{position:absolute;right:-30px;top:30px;width:240px;height:52px;background:linear-gradient(#b89d72e0,#a98e64e0);transform:rotate(28deg);box-shadow:0 1px 3px #0003}
+.items{display:grid;grid-template-columns:1fr 1fr;gap:18px 14px;margin-top:22px;position:relative}
+.sticker{display:flex;align-items:center;gap:12px;background:#f4f1ea;padding:10px 12px 10px 10px;box-shadow:0 2px 0 #0002,0 6px 14px #0002;transform:rotate(var(--r));transition:transform .25s}
+.sticker:hover{transform:rotate(0) scale(1.04)}
+.sticker .ico{flex:none;width:58px;height:58px;display:grid;place-items:center;animation:bob 2.6s ease-in-out infinite;animation-delay:var(--d)}
+@keyframes bob{50%{transform:translateY(-4px) rotate(3deg)}}
+.sticker b{display:block;font-weight:400;font-size:14.5px;color:var(--ink);line-height:1.2}
+.sticker .pts{display:inline-block;margin-top:4px;background:var(--ink);color:var(--paper);font-size:13px;padding:0 6px}
+.ico .face{width:52px;height:52px;border-radius:50%;object-fit:cover;border:3px solid #fff;box-shadow:0 0 0 1px #0002}
+.ico .gold{filter:sepia(1) saturate(4) hue-rotate(-8deg) brightness(1.05) contrast(1.05);border-color:#ffd54a;box-shadow:0 0 0 1px #c9a200,0 0 16px #ffd54a}
+.ico .sosie-w{position:relative}
+.ico .sosie-w img{filter:grayscale(1) contrast(1.2)}
+.ico .sosie-w svg{position:absolute;inset:0}
+.coin{width:50px;height:50px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3b0,#f2c02e 45%,#c58f00);box-shadow:inset 0 0 0 3px #e0ac10,inset 0 0 0 5px #fff4,0 2px 0 #9b7000;display:grid;place-items:center;color:#5a4300;font-family:var(--sans);font-weight:700;font-size:18px;animation:spin 3s ease-in-out infinite}
+@keyframes spin{0%,60%{transform:scaleX(1)}70%{transform:scaleX(.08)}80%{transform:scaleX(1)}}
+.items-note{position:relative;margin:22px 0 0;font-size:13px;color:#3a3020;display:flex;gap:8px;align-items:center}
+.items-note i{width:8px;height:8px;background:var(--ink);animation:blink .4s steps(1) infinite}
+@media (max-width:420px){.items{grid-template-columns:1fr}}
+
+/* ---------- GALLERY ---------- */
+.c-gal{background:var(--screen);border-radius:14px;padding:24px 20px 18px;box-shadow:inset 0 0 0 1px #0000001a,inset 0 2px 0 #fff8;display:flex;flex-direction:column}
+.c-gal .head{display:flex;justify-content:space-between;align-items:center}
+.c-gal .count{font-size:12.5px;color:var(--ink);letter-spacing:.08em}
+.slides{position:relative;margin-top:14px;aspect-ratio:1;background:#111114;overflow:hidden}
+.slides img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.05);transition:opacity .6s,transform 3.6s linear}
+.slides img.on{opacity:1;transform:scale(1)}
+.arrow{position:absolute;top:50%;margin-top:-20px;width:40px;height:40px;border:0;background:var(--carbon);color:#fff;display:grid;place-items:center;cursor:pointer;z-index:2}
+.arrow:hover{background:#000}
+.arrow svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2}
+.arrow.prev{left:0}.arrow.next{right:0}
+.gal-cap{margin:12px 0 0;color:var(--ink);font-size:15px;min-height:2.9em}
+.progress{height:3px;background:#0002;margin-top:8px}
+.progress i{display:block;height:100%;width:0;background:var(--ink)}
+
+/* ---------- DISCORD TICKET ---------- */
+.c-disc{display:flex;background:linear-gradient(160deg,var(--lav1) 0%,var(--lav2) 55%,var(--lav3) 100%);color:var(--ink);
+  clip-path:polygon(22px 0,100% 0,100% 100%,22px 100%,0 calc(100% - 22px),0 22px);min-height:360px}
+.c-disc .stub{width:40px;flex:none;border-right:2px dashed #6f74b873;display:flex;align-items:center;justify-content:center}
+.c-disc .stub span{width:22px;height:22px;border-radius:50%;background:var(--paper);box-shadow:0 0 0 5px #8a8ec9,0 0 0 6px #6f74b8,inset 0 2px 3px #0004}
+.c-disc .body{flex:1;padding:16px;display:flex;flex-direction:column;position:relative;min-width:0}
+.c-disc h3{font-weight:400;font-size:clamp(26px,2.4vw,34px);margin:12px 0 10px;letter-spacing:-.02em;line-height:1.05;position:relative}
+.c-disc p{margin:0 0 6px;position:relative}
+.c-disc .chan{display:inline-block;background:#fff8;padding:0 6px;border:1px dashed #6f74b8}
+.c-disc .blue{position:absolute;right:-30px;bottom:-30px;width:210px;opacity:.35;pointer-events:none}
+.c-disc .btns{margin-top:auto;display:flex;flex-direction:column;gap:12px;align-items:flex-end;position:relative;padding-top:16px}
+.copied{font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:0;transition:opacity .2s}
+.copied.show{opacity:1}
+
+/* ---------- TROPHIES ---------- */
+.c-tro{background:var(--card-dark);color:#eee;padding:20px 20px 22px}
+.c-tro::after{content:"";position:absolute;inset:0;background:var(--noise);opacity:.15;mix-blend-mode:overlay;pointer-events:none}
+.tro-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.tro-bar{flex:1;max-width:340px;height:10px;border:1px solid #777;padding:1px;margin-left:auto}
+.tro-bar i{display:block;height:100%;width:0;background:repeating-linear-gradient(90deg,var(--accent) 0 8px,#0000 8px 10px);transition:width 1.4s cubic-bezier(.2,.9,.2,1) .3s}
+.tro-num{font-size:13px;letter-spacing:.08em}
+.tro-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px 22px;margin-top:20px;position:relative;z-index:1}
+.tro{display:flex;gap:12px;align-items:center;min-width:0}
+.tro .tile{flex:none;width:56px;height:56px;display:grid;place-items:center;font-size:15px;color:#ddd;position:relative;
+  background:#2c2c2c;background-image:radial-gradient(#ffffff26 1px,#0000 1.3px);background-size:5px 5px}
+.tro.on .tile{color:var(--carbon);background-color:var(--accent);background-image:radial-gradient(#0002 1px,#0000 1.3px)}
+.tro .nm{font-size:16px;color:#fff;line-height:1.2}
+.tro .ds{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#aaa;margin-top:3px;line-height:1.35}
+.tro.locked .nm{color:#bbb}
+.tro.hidden .ds{filter:blur(4px);transition:filter .25s;cursor:help}
+.tro.hidden:hover .ds,.tro.hidden.peek .ds{filter:none}
+.tro-foot{margin-top:18px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#aaa;position:relative;z-index:1}
+
+footer{max-width:1400px;margin:14px auto 0;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
+footer a{text-decoration:none}footer a:hover{text-decoration:underline}
+
+/* toast + confetti */
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,calc(100% + 40px));visibility:hidden;background:var(--carbon);color:#fff;padding:12px 18px;z-index:50;transition:transform .4s cubic-bezier(.2,1.4,.4,1);font-size:14px;max-width:calc(100% - 32px);text-align:center}
+.toast.show{transform:translate(-50%,0);visibility:visible}
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:40}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none !important;transition:none !important}
+  .rv{opacity:1;transform:none}
+}
 </style>
 </head>
 <body>
-<div class="win">
-  <div class="bar"><span>secret.txt - Bloc-notes</span><i>_ □ ×</i></div>
-  <div class="menu">Fichier Edition Format Affichage Aide</div>
-<pre>Merci d'avoir été jusque là !
-Pour te récompenser,
-voici un petit secret...
 
-<b>root@aywen:~$ ./snake</b>
-Un Snake caché : Root en tête,
-Aywen à la place des pommes.
+<nav>
+  <a class="logo" href="../" aria-label="Lancer le snake">
+    <svg viewBox="0 0 26 26" aria-hidden="true"><rect x="1" y="1" width="24" height="24" rx="5" fill="#333"/><path d="M6 17h4v-4h4V9h6" fill="none" stroke="#ffa133" stroke-width="3" stroke-linecap="square"/><rect x="18" y="7" width="4" height="4" fill="#fff"/></svg>
+    <b>./SNAKE<i>_</i></b>
+  </a>
+  <div class="links">
+    <a href="https://aywen.fr/"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>retour sur aywen.fr</a>
+    <a href="#commandes"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="11" rx="2"/><path d="M7 11h1M11 11h2M16 11h1M8 14h8"/></svg>commandes</a>
+    <a href="https://aywen.fr/discord"><svg viewBox="0 0 24 24"><path d="M4 6h16v10H9l-5 4z"/></svg>discord</a>
+  </div>
+  <span class="rec" id="navRec"></span>
+</nav>
 
-== COMMENT JOUER ==
+<main>
 
-  Bouger   ← ↑ → ↓  ou  ZQSD
-  Pause    Espace
-  Mobile   glisse le doigt
+  <!-- HERO -->
+  <section class="card c-hero rv" aria-labelledby="t1">
+    <div class="slot" aria-hidden="true"></div>
+    <div class="hero-top">
+      <span class="label">Mission accomplie</span>
+      <h1 class="typed" id="t1" aria-label="Merci d'avoir été jusque là !"><span id="typed">Merci d'avoir été jusque là !</span><span class="caret" aria-hidden="true"></span></h1>
+      <p class="typed2" id="typed2">Pour te récompenser, voici un petit secret...</p>
+      <div class="hero-stats" id="heroStats" hidden>
+        <div><b id="sBest">0</b><small class="caps">ton record</small></div>
+        <div><b id="sTro">0/14</b><small class="caps">trophées</small></div>
+        <div><b id="sGames">0</b><small class="caps">parties</small></div>
+      </div>
+    </div>
 
-  1. Mange un max d'Aywen.
-  2. Évite les murs et
-     ta propre queue.
-  3. Tous les 10 Aywen,
-     l'équipe tombe en confettis.
-  4. Ça accélère vite.
+    <div class="secret" id="secret">
+      <div class="inside">
+        <div class="cmd">root@aywen<span>:~$</span> ./snake</div>
+        <p>Un Snake caché sur le site. Root en tête, Aywen à la place des pommes, et toute l'équipe en confettis tous les 10 Aywen.</p>
+        <figure class="polaroid"><img src="img/play.jpg" alt="Partie du Snake root en cours" width="560" height="560" loading="lazy"><figcaption>root a faim</figcaption></figure>
+        <div class="row">
+          <a class="keybtn big" href="../"><span class="keybtn-cap">Jouer maintenant
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+          <a href="#commandes" class="caps" style="color:var(--ink)">ou lire le tuto ↓</a>
+        </div>
+      </div>
+      <button class="folder" id="folder" aria-label="Ouvrir le dossier secret" style="border:0;padding:0;width:100%;font:inherit">
+        <span class="tape t1"></span>
+        <span class="stamp">Top secret<small>dossier n°0x1F</small></span>
+        <span class="tape t2"></span>
+        <span class="hint">Clique pour décoller le scotch</span>
+      </button>
+    </div>
+  </section>
 
-== OBJETS RARES ==
+  <!-- DEMO -->
+  <section class="card c-demo rv" aria-labelledby="t2">
+    <span class="screw tl"></span><span class="screw tr"></span><span class="screw bl"></span><span class="screw br"></span>
+    <div class="head">
+      <span class="label">En direct du terminal</span>
+      <span class="live"><i></i>LIVE</span>
+    </div>
+    <div class="tv">
+      <span class="score">AYWEN <b id="dScore">0</b></span>
+      <span class="bot">AUTO-PILOT</span>
+      <canvas id="demo" width="560" height="560" aria-label="Démo animée du snake qui joue tout seul"></canvas>
+    </div>
+    <div class="demo-txt">
+      <h2 id="t2">Mange des <em>Aywen</em>.<br>Grandis. Survis.</h2>
+      <p>Tu diriges Root. Chaque Aywen avalé te rallonge d'une case, et le jeu accélère. Le bot joue tout seul pour te montrer. Toi, tu feras mieux.</p>
+      <a class="keybtn big" href="../"><span class="keybtn-cap">sudo ./play</span></a>
+      <div class="meta">Gratuit · Navigateur · Mobile et PC</div>
+    </div>
+  </section>
 
-  Visibles quelques secondes.
-  Ouvre l'œil.
+  <!-- KEYS -->
+  <section class="card c-keys rv" id="commandes" aria-labelledby="t3">
+    <span class="label" id="t3">Les commandes</span>
+    <div class="keys-wrap">
+      <div>
+        <div class="kgrid">
+          <span class="k keycap" data-k="up">↑</span><span class="k keycap" data-k="left">←</span><span class="k keycap" data-k="down">↓</span><span class="k keycap" data-k="right">→</span>
+        </div>
+        <div class="kcap"><span>flèches</span></div>
+      </div>
+      <div>
+        <div class="kgrid">
+          <span class="k keycap" data-k="up">Z</span><span class="k keycap" data-k="left">Q</span><span class="k keycap" data-k="down">S</span><span class="k keycap" data-k="right">D</span>
+        </div>
+        <div class="kcap"><span>ou ZQSD</span></div>
+      </div>
+    </div>
+    <div class="keycap space" data-k="space">espace = pause</div>
+    <div class="swipe">
+      <div class="phone" aria-hidden="true"><i></i></div>
+      <div><b style="font-weight:400;color:var(--ink)">Sur mobile</b><br>Glisse le doigt sur le plateau, ou utilise les flèches à l'écran.</div>
+    </div>
+  </section>
 
-  Page de la BD ...... +2
-  Pièce R$ ........... +2
-  Le sosie ........... +3
-  Aywen en or ........ +5
+  <!-- RULES -->
+  <section class="card c-rules rv" aria-labelledby="t4" style="--rot:-1deg">
+    <svg class="clip" viewBox="0 0 22 64" aria-hidden="true"><path d="M6 20V8a5 5 0 0 1 10 0v44a8 8 0 0 1-16 0V14" fill="none" stroke="#9a9a9a" stroke-width="2.4" stroke-linecap="round"/><path d="M6 20V8a5 5 0 0 1 10 0v44a8 8 0 0 1-16 0V14" fill="none" stroke="#e8e8e8" stroke-width="1" stroke-linecap="round" transform="translate(-.6 -.6)"/></svg>
+    <span class="label" id="t4">Les règles</span>
+    <ol class="rules">
+      <li><b>01</b><span>Mange un max d'Aywen pour grandir.</span></li>
+      <li><b>02</b><span>Évite les murs et ta propre queue.</span></li>
+      <li><b>03</b><span>Tous les 10 Aywen, l'équipe débarque en confettis.</span></li>
+      <li><b>04</b><span>Plus tu manges, plus ça va vite. Jusqu'au mode Fuze.</span></li>
+    </ol>
+  </section>
 
-== TROPHÉES ==
+  <!-- ITEMS -->
+  <section class="card c-items rv" aria-labelledby="t5" style="--rot:.6deg">
+    <span class="torn" aria-hidden="true"></span>
+    <span class="big-tape" aria-hidden="true"></span>
+    <span class="label" id="t5">Objets rares</span>
+    <div class="items">
+      <div class="sticker" style="--r:-3deg">
+        <div class="ico" style="--d:0s"><svg width="44" height="54" viewBox="0 0 44 54"><rect x="2" y="2" width="40" height="50" fill="#f7f3e8" stroke="#222" stroke-width="1.5"/><path d="M7 7l30 1-1 18-30-1zM7 30l13 .5-.5 17-13-.5zM24 30l13-.5.5 17-13 .5z" fill="none" stroke="#222" stroke-width="1.6" stroke-linejoin="round"/><circle cx="15" cy="13" r="2.5" fill="none" stroke="#222" stroke-width="1.4"/><path d="M15 15.5v6M11 18h8" stroke="#222" stroke-width="1.4"/><ellipse cx="28" cy="13" rx="6" ry="3" fill="#D2331B"/></svg></div>
+        <div><b>Page de la BD faite main</b><span class="pts">+2</span></div>
+      </div>
+      <div class="sticker" style="--r:2.5deg">
+        <div class="ico" style="--d:.4s"><span class="coin">R$</span></div>
+        <div><b>Pièce R$</b><span class="pts">+2</span></div>
+      </div>
+      <div class="sticker" style="--r:2deg">
+        <div class="ico" style="--d:.8s"><span class="sosie-w"><img class="face" src="../assets/aywen.jpg" alt=""><svg viewBox="0 0 52 52" aria-hidden="true"><g fill="none" stroke="#111" stroke-width="2.6"><circle cx="18" cy="22" r="6"/><circle cx="34" cy="22" r="6"/><path d="M24 22h4"/></g><path d="M16 34c4-3 7-1 10 0 3-1 6-3 10 0-4 3-7 1-10 0-3 1-6 3-10 0z" fill="#111"/></svg></span></div>
+        <div><b>Le sosie<br><small style="color:#777">Micode ? Non.</small></b><span class="pts">+3</span></div>
+      </div>
+      <div class="sticker" style="--r:-2deg">
+        <div class="ico" style="--d:1.2s"><img class="face gold" src="../assets/aywen.jpg" alt=""></div>
+        <div><b>Aywen en or</b><span class="pts">+5</span></div>
+      </div>
+    </div>
+    <p class="items-note"><i aria-hidden="true"></i>Ils n'apparaissent que quelques secondes et clignotent avant de partir. Ouvre l'œil.</p>
+  </section>
 
-  14 à débloquer.
-  Indice : haut, haut, bas, bas...
+  <!-- GALLERY -->
+  <section class="card c-gal rv" aria-labelledby="t6">
+    <span class="screw tl"></span><span class="screw tr"></span><span class="screw bl"></span><span class="screw br"></span>
+    <div class="head"><span class="label" id="t6">Captures</span><span class="count" id="gCount">01/04</span></div>
+    <div class="slides" id="slides">
+      <img class="on" src="img/play.jpg" alt="Partie en cours, Root a mangé 24 Aywen" data-cap="Root en chasse. L'Aywen en or brille en haut : fonce." width="560" height="560">
+      <img src="img/confetti.jpg" alt="L'équipe tombe en confettis" data-cap="10 Aywen de plus : toute l'équipe tombe du ciel." width="560" height="560" loading="lazy">
+      <img src="img/over.jpg" alt="Écran nouveau record" data-cap="Nouveau record. Screen, et direction le Discord." width="560" height="560" loading="lazy">
+      <img src="img/start.jpg" alt="Écran d'accueil" data-cap="L'écran d'accueil. Un clic sur sudo ./play et c'est parti." width="560" height="560" loading="lazy">
+      <button class="arrow prev" aria-label="Capture précédente"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+      <button class="arrow next" aria-label="Capture suivante"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+    </div>
+    <p class="gal-cap" id="gCap">Root en chasse. L'Aywen en or brille en haut : fonce.</p>
+    <div class="progress"><i id="gProg"></i></div>
+  </section>
 
-&gt; <a href="../">Lancer le jeu</a>
+  <!-- DISCORD -->
+  <section class="card c-disc rv" aria-labelledby="t7">
+    <div class="stub" aria-hidden="true"><span></span></div>
+    <div class="body">
+      <div><span class="label">La communauté</span></div>
+      <h3 id="t7">Montre ton score</h3>
+      <p>Fais un screen et partage-le dans le salon <span class="chan">#médias</span> du Discord.</p>
+      <p style="font-size:13px;opacity:.75">Le meilleur score gagne le respect éternel de Root.</p>
+      <svg class="blue" viewBox="0 0 200 200" aria-hidden="true" fill="none" stroke="#4b4f99" stroke-width="1.2"><circle cx="100" cy="100" r="90" stroke-dasharray="4 5"/><circle cx="100" cy="100" r="60"/><path d="M40 100h120M100 40v120"/><rect x="62" y="74" width="76" height="52" rx="20"/><circle cx="84" cy="100" r="7"/><circle cx="116" cy="100" r="7"/></svg>
+      <div class="btns">
+        <span class="copied" id="copied">Copié. Colle-le sur Discord.</span>
+        <button class="keybtn" id="copyBtn" type="button"><span class="keybtn-cap">Copier mon score</span></button>
+        <a class="keybtn" href="https://aywen.fr/discord" target="_blank" rel="noopener"><span class="keybtn-cap">Rejoindre</span></a>
+      </div>
+    </div>
+  </section>
 
-N'hésite pas à partager ton score
-dans le canal <b>#médias</b> du Discord !
-<span class="cur"></span></pre>
-  <div class="status"><span>Ln 41, Col 1</span><span>UTF-8</span></div>
-</div>
+  <!-- TROPHIES -->
+  <section class="card c-tro rv" aria-labelledby="t8">
+    <div class="tro-head">
+      <span class="label light" id="t8">Trophées</span>
+      <span class="tro-num" id="troNum">0/14 débloqués</span>
+      <span class="tro-bar" aria-hidden="true"><i id="troBar"></i></span>
+    </div>
+    <div class="tro-list" id="troList"></div>
+    <p class="tro-foot">Survole (ou touche) une description floutée pour un indice. Et pour sudo confetti : haut, haut, bas, bas... ça marche aussi ici.</p>
+  </section>
+</main>
+
+<footer>
+  <span>Fait par Volko pour la commu d'Aywen.</span>
+  <span><a href="https://aywen.fr/">aywen.fr</a> · <a href="../">jouer</a> · <a href="https://aywen.fr/discord">discord</a></span>
+</footer>
+
+<canvas id="fx" aria-hidden="true"></canvas>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const store = { get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } } };
+
+/* ---------- player stats (même domaine que le jeu) ---------- */
+const best = +(store.get('snakeroot_best')||0), games = +(store.get('snakeroot_games')||0);
+let unlocked = {}; try{ unlocked = JSON.parse(store.get('snakeroot_trophies')||'{}')||{}; }catch(e){}
+const TROPHIES = [
+  ['first','1','Premier Aywen','Manger ton tout premier Aywen.'],
+  ['team','x10','L\'équipe au complet','Atteindre 10 Aywen.'],
+  ['bd','BD','La BD faite main','Récupérer une page de la BD.'],
+  ['bdfull','BD3','Intégrale collector','3 pages de BD dans la même partie.',1],
+  ['commu','OR','Une commu en or','Manger l\'Aywen en or.'],
+  ['sosie','?','Micode ? Hugo Décrypte ?','Attraper le sosie.',1],
+  ['robux','R$','Riche en Robux','Ramasser une pièce R$.'],
+  ['obby','30','Obby terminé','Atteindre 30 Aywen.'],
+  ['oof','OOF','Oof','Mourir sans manger un seul Aywen.',1],
+  ['ouro','∞','Ouroboros','Te mordre la queue.',1],
+  ['fuze','MAX','Mode Fuze','Atteindre la vitesse maximale.'],
+  ['golden','50','Commu légendaire','Atteindre 50 Aywen.'],
+  ['grind','10','Grind de vidéo','Lancer 10 parties.'],
+  ['konami','↑↑↓↓','sudo confetti','Trouver le code secret.',1],
+];
+const nUn = TROPHIES.filter(t=>unlocked[t[0]]).length;
+$('troList').innerHTML = TROPHIES.map(([id,ic,nm,ds,hid])=>{
+  const on = !!unlocked[id];
+  return `<div class="tro ${on?'on':'locked'} ${hid&&!on?'hidden':''}"><span class="tile">${ic}</span><div><div class="nm">${nm}</div><div class="ds">${on?'Débloqué':ds}</div></div></div>`;
+}).join('');
+document.querySelectorAll('.tro.hidden').forEach(t=>t.addEventListener('click',()=>t.classList.toggle('peek')));
+$('troNum').textContent = `${nUn}/${TROPHIES.length} débloqués`;
+if(best || games || nUn){
+  $('heroStats').hidden = false;
+  $('sBest').textContent = best; $('sTro').textContent = `${nUn}/14`; $('sGames').textContent = games;
+  $('navRec').textContent = `ton record : ${best} Aywen`;
+}
+
+/* ---------- reveal on scroll ---------- */
+const cards = document.querySelectorAll('.rv');
+if('IntersectionObserver' in window && !reduce){
+  const io = new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);
+    if(e.target.classList.contains('c-tro')) $('troBar').style.width = (nUn/TROPHIES.length*100)+'%'; } }),{threshold:.12});
+  cards.forEach((c,i)=>{ c.style.transitionDelay = (Math.min(i,4)*90)+'ms'; io.observe(c); });
+} else { cards.forEach(c=>c.classList.add('in')); $('troBar').style.width = (nUn/TROPHIES.length*100)+'%'; }
+
+/* ---------- typewriter ---------- */
+function type(el, text, speed){ return new Promise(res=>{ if(reduce){ el.textContent=text; return res(); }
+  el.textContent=''; let i=0; const t=setInterval(()=>{ el.textContent=text.slice(0,++i); if(i>=text.length){ clearInterval(t); res(); } }, speed); }); }
+const caret = document.querySelector('.caret');
+(async()=>{
+  const l1 = $('typed').textContent, l2 = $('typed2').textContent;
+  $('typed2').textContent = '';
+  await new Promise(r=>setTimeout(r, reduce?0:500));
+  await type($('typed'), l1, 55);
+  $('typed2').appendChild(caret);
+  const span = document.createElement('span'); $('typed2').prepend(span);
+  await new Promise(r=>setTimeout(r, reduce?0:350));
+  await type(span, l2, 38);
+})();
+
+/* ---------- secret folder ---------- */
+$('folder').addEventListener('click', ()=>{
+  $('secret').classList.add('open');
+  setTimeout(()=>burst(innerWidth*0.25, innerHeight*0.6, 70), reduce?0:700);
+});
+
+/* ---------- live demo (bot) ---------- */
+const cv = $('demo'), g = cv.getContext('2d');
+const N = 14, C = cv.width / N;
+const imgs = {};
+['root','aywen','lemoustique','margouta','seiny','julien','volko'].forEach(id=>{ const i=new Image(); i.src=`../assets/${id}.jpg`; imgs[id]=i; });
+const D = {up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]};
+let sn, food, dir, dscore, dead=0, pops=[];
+function dReset(){ sn=[{x:4,y:7},{x:3,y:7},{x:2,y:7}]; dir='right'; dscore=0; $('dScore').textContent=0; placeF(); }
+function placeF(){ let p; do{ p={x:Math.random()*N|0,y:Math.random()*N|0}; }while(sn.some(s=>s.x===p.x&&s.y===p.y)); food=p; }
+const key = p=>p.y*N+p.x;
+function free(p, body){ return p.x>=0&&p.y>=0&&p.x<N&&p.y<N&&!body.has(key(p)); }
+function bfs(start, goal, body){
+  const prev = new Map([[key(start),null]]); const q=[start];
+  while(q.length){ const c=q.shift(); if(c.x===goal.x&&c.y===goal.y){ let k=key(c), first=null; while(prev.get(k)!==null){ first=k; k=prev.get(k).k; } return first; }
+    for(const d in D){ const n={x:c.x+D[d][0],y:c.y+D[d][1]}; const nk=key(n); if(!prev.has(nk)&&free(n,body)){ prev.set(nk,{k:key(c),d}); q.push(n); } } }
+  return null;
+}
+function area(p, body){ const seen=new Set([key(p)]); const q=[p]; while(q.length){ const c=q.shift(); for(const d in D){ const n={x:c.x+D[d][0],y:c.y+D[d][1]}; if(!seen.has(key(n))&&free(n,body)){ seen.add(key(n)); q.push(n);} } } return seen.size; }
+function choose(){
+  const h=sn[0], body=new Set(sn.slice(0,-1).map(key));
+  const opts = Object.keys(D).map(d=>({d,p:{x:h.x+D[d][0],y:h.y+D[d][1]}})).filter(o=>free(o.p,body));
+  if(!opts.length) return dir;
+  const fk = bfs(h, food, body);
+  if(fk!==null){ const o=opts.find(o=>key(o.p)===fk); if(o && area(o.p, new Set(sn.map(key))) > sn.length*0.6) return o.d; }
+  opts.sort((a,b)=>area(b.p,body)-area(a.p,body)); return opts[0].d;
+}
+function press(k){ document.querySelectorAll(`[data-k="${k}"]`).forEach(el=>{ el.dataset.active='true'; setTimeout(()=>el.dataset.active='false',170); }); }
+function dStep(){
+  if(dead){ if(--dead===0) dReset(); return; }
+  const nd = choose(); if(nd!==dir) press(nd); dir=nd;
+  const h={x:sn[0].x+D[dir][0], y:sn[0].y+D[dir][1]};
+  const body=new Set(sn.slice(0,-1).map(key));
+  if(!free(h,body)){ dead=12; return; }
+  sn.unshift(h);
+  if(h.x===food.x&&h.y===food.y){ dscore++; $('dScore').textContent=dscore; pops.push({x:food.x,y:food.y,t:0}); placeF();
+    if(dscore%10===0) for(let i=0;i<5;i++) pops.push({x:Math.random()*N,y:N+1,t:0,team:['lemoustique','margouta','seiny','julien','volko'][i],vx:(Math.random()-.5)*.25,vy:-(.55+Math.random()*.25)});
+    if(sn.length>N*N*0.45){ dead=20; }
+  } else sn.pop();
+}
+function circImg(img, cx, cy, r, ring){
+  g.save(); g.beginPath(); g.arc(cx,cy,r,0,Math.PI*2); g.closePath();
+  if(img.complete&&img.naturalWidth){ g.clip(); g.drawImage(img,cx-r,cy-r,r*2,r*2); } else { g.fillStyle=ring; g.fill(); }
+  g.restore(); g.lineWidth=C*0.08; g.strokeStyle='#fff'; g.beginPath(); g.arc(cx,cy,r,0,Math.PI*2); g.stroke();
+}
+function draw(t){
+  g.fillStyle='#111114'; g.fillRect(0,0,cv.width,cv.height);
+  for(let y=0;y<N;y++) for(let x=0;x<N;x++) if((x+y)%2){ g.fillStyle='#16161b'; g.fillRect(x*C,y*C,C,C); }
+  // food
+  const pulse = 1+Math.sin(t/180)*0.06;
+  g.save(); g.shadowColor='rgba(210,51,27,.8)'; g.shadowBlur=18; circImg(imgs.aywen, food.x*C+C/2, food.y*C+C/2, C*0.42*pulse, '#D2331B'); g.restore();
+  // body
+  for(let i=sn.length-1;i>0;i--){ const s=sn[i], k=i/sn.length;
+    g.fillStyle = `rgb(${236-k*60|0},${130-k*55|0},${48-k*30|0})`;
+    const m=C*(0.12+k*0.06); g.beginPath(); g.roundRect(s.x*C+m, s.y*C+m, C-2*m, C-2*m, C*0.28); g.fill(); }
+  // head
+  const h=sn[0]; if(dead && (dead%4<2)) g.globalAlpha=.3;
+  circImg(imgs.root, h.x*C+C/2, h.y*C+C/2, C*0.56, '#1b1b20'); g.globalAlpha=1;
+  // pops
+  pops = pops.filter(p=>p.t<1);
+  for(const p of pops){
+    if(p.team){ p.x+=p.vx; p.y+=p.vy; p.vy+=0.012; p.t+=0.008; circImg(imgs[p.team], p.x*C, p.y*C, C*0.9, '#888'); }
+    else { p.t+=0.03; g.globalAlpha=1-p.t; g.fillStyle='#ffa133'; g.font=`${C*0.55}px departure, monospace`; g.textAlign='center'; g.fillText('+1', p.x*C+C/2, p.y*C - p.t*C*1.4); g.globalAlpha=1; }
+  }
+}
+dReset();
+let acc=0, last=performance.now(), visible=true;
+new IntersectionObserver(es=>{ visible = es[0].isIntersecting; }).observe(cv);
+function loop(now){
+  const dt=Math.min(100, now-last); last=now;
+  if(visible && !document.hidden){ acc+=dt; const tick = Math.max(70, 125 - dscore*2); while(acc>tick){ acc-=tick; dStep(); } draw(now); }
+  requestAnimationFrame(loop);
+}
+if(reduce){ draw(0); } else requestAnimationFrame(loop);
+
+/* real keys light up keycaps */
+const KM={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',z:'up',q:'left',s:'down',d:'right',w:'up',a:'left',' ':'space'};
+addEventListener('keydown',e=>{ const k=KM[e.key]||KM[e.key.toLowerCase?.()]; if(k) press(k); });
+document.querySelectorAll('.keycap').forEach(k=>k.addEventListener('pointerdown',()=>press(k.dataset.k)));
+
+/* ---------- gallery ---------- */
+const slides=[...document.querySelectorAll('#slides img')]; let si=0, gT=0;
+function show(i){ slides[si].classList.remove('on'); si=(i+slides.length)%slides.length; slides[si].classList.add('on');
+  $('gCap').textContent=slides[si].dataset.cap; $('gCount').textContent=`0${si+1}/0${slides.length}`; gT=0; }
+document.querySelector('.arrow.prev').onclick=()=>show(si-1);
+document.querySelector('.arrow.next').onclick=()=>show(si+1);
+let gLast=performance.now();
+(function gl(now){ const dt=now-gLast; gLast=now; if(!reduce && !document.hidden){ gT+=dt; if(gT>4200) show(si+1); $('gProg').style.width=Math.min(100,gT/42)+'%'; } requestAnimationFrame(gl); })(gLast);
+
+/* ---------- copy score ---------- */
+$('copyBtn').onclick = async ()=>{
+  const txt = best ? `J'ai mangé ${best} Aywen sur ./snake (${nUn}/14 trophées). Qui fait mieux ?` : `Je viens de découvrir le snake secret d'aywen.fr. Qui a le meilleur score ?`;
+  try{ await navigator.clipboard.writeText(txt); }catch(e){ const ta=document.createElement('textarea'); ta.value=txt; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy');}catch(_){} ta.remove(); }
+  $('copied').classList.add('show'); setTimeout(()=>$('copied').classList.remove('show'),2200);
+};
+
+/* ---------- confetti fx ---------- */
+const fx=$('fx'), f=fx.getContext('2d'); let parts=[], fxOn=false;
+function size(){ fx.width=innerWidth*devicePixelRatio; fx.height=innerHeight*devicePixelRatio; } size(); addEventListener('resize',size);
+const COLS=['#ffa133','#333','#b3b6e4','#d6c9b0','#fff'];
+function burst(x,y,n,faces){
+  if(reduce) return; const dp=devicePixelRatio;
+  for(let i=0;i<n;i++){ const a=Math.random()*Math.PI*2, v=(4+Math.random()*8)*dp;
+    parts.push({x:x*dp,y:y*dp,vx:Math.cos(a)*v,vy:Math.sin(a)*v-6*dp,r:Math.random()*6,vr:(Math.random()-.5)*.3,w:(5+Math.random()*7)*dp,h:(3+Math.random()*5)*dp,c:COLS[i%COLS.length],life:1}); }
+  if(faces) ['lemoustique','margouta','seiny','julien','volko','aywen','root'].forEach((id,i)=>parts.push({x:(Math.random()*innerWidth)*dp,y:-80*dp-i*60*dp,vx:(Math.random()-.5)*2*dp,vy:(2+Math.random()*2)*dp,r:0,vr:(Math.random()-.5)*.05,img:imgs[id],s:(56+Math.random()*30)*dp,life:1}));
+  if(!fxOn){ fxOn=true; requestAnimationFrame(fxLoop); }
+}
+function fxLoop(){
+  f.clearRect(0,0,fx.width,fx.height); const dp=devicePixelRatio;
+  parts=parts.filter(p=>p.y<fx.height+120*dp && p.life>0);
+  for(const p of parts){
+    p.x+=p.vx; p.y+=p.vy; p.r+=p.vr;
+    if(p.img){ p.vy+=0.05*dp; f.save(); f.translate(p.x,p.y); f.rotate(p.r); f.beginPath(); f.arc(0,0,p.s/2,0,Math.PI*2); f.fillStyle='#fff'; f.fill(); f.clip();
+      if(p.img.complete&&p.img.naturalWidth) f.drawImage(p.img,-p.s/2+3*dp,-p.s/2+3*dp,p.s-6*dp,p.s-6*dp); f.restore(); }
+    else { p.vy+=0.3*dp; p.vx*=.98; p.life-=.006; f.save(); f.translate(p.x,p.y); f.rotate(p.r); f.fillStyle=p.c; f.fillRect(-p.w/2,-p.h/2,p.w,p.h); f.restore(); }
+  }
+  if(parts.length) requestAnimationFrame(fxLoop); else { fxOn=false; f.clearRect(0,0,fx.width,fx.height); }
+}
+function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),2600); }
+
+/* ---------- konami ---------- */
+const KON=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a']; let ki=0;
+addEventListener('keydown',e=>{ ki=(e.key===KON[ki])?ki+1:(e.key===KON[0]?1:0); if(ki===KON.length){ ki=0; burst(innerWidth/2,innerHeight/2,120,true); toast('sudo confetti : l\'équipe débarque'); } });
+})();
+</script>
 </body>
 </html>

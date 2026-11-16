@@ -32,4 +32,4 @@ puis http://localhost:8080 — ou ouvre simplement `index.html`.
 
 ## Page tuto
 
-`/tuto/` : page « bloc-notes » minimaliste qui explique comment jouer, avec un lien vers le jeu. C'est le lien à mettre sur aywen.fr à la fin du jeu.
+`/tuto/` : page « petit secret » aux couleurs d'aywen.fr (démo animée jouée par un bot, commandes, objets rares, captures, trophées du joueur lus depuis le localStorage, lien Discord). C'est le lien à mettre sur aywen.fr à la fin du jeu. Police Departure Mono (licence OFL) dans `tuto/fonts/`.
