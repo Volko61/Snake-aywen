@@ -29,3 +29,7 @@ puis http://localhost:8080 — ou ouvre simplement `index.html`.
 4. **Deploy**.
 5. Onglet **Domains** → ajoute ton domaine, **Container Port : 80**, active HTTPS (Let's Encrypt).
 6. Optionnel : active **Autodeploy** pour redéployer à chaque push.
+
+## Page tuto
+
+`/tuto/` : page « bloc-notes » minimaliste qui explique comment jouer, avec un lien vers le jeu. C'est le lien à mettre sur aywen.fr à la fin du jeu.

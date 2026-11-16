@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f4f1ea">
+<title>secret.txt - Bloc-notes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --paper:#fbfaf6; --bg:#ecebe6; --ink:#1c1c1c; --mut:#8a877f; --line:#d9d6cd; --red:#D2331B; }
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);
+    font-family:'JetBrains Mono',ui-monospace,Consolas,monospace;font-size:15px;line-height:1.7}
+  body{display:flex;justify-content:center;padding:24px 16px}
+  .win{width:100%;max-width:680px;background:var(--paper);border:1px solid var(--line);box-shadow:0 1px 0 rgba(0,0,0,.04),0 12px 30px rgba(0,0,0,.06)}
+  .bar{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;border-bottom:1px solid var(--line);font-size:12px;color:var(--mut)}
+  .bar i{font-style:normal;letter-spacing:6px}
+  .menu{padding:3px 12px;border-bottom:1px solid var(--line);font-size:12px;color:var(--mut);word-spacing:10px}
+  pre{margin:0;padding:20px 22px 28px;white-space:pre-wrap;word-wrap:break-word;font:inherit}
+  a{color:var(--red);font-weight:700}
+  b{font-weight:700}
+  .cur{display:inline-block;width:8px;height:1.1em;background:var(--ink);vertical-align:-3px;animation:blink 1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+  .status{display:flex;justify-content:space-between;padding:3px 12px;border-top:1px solid var(--line);font-size:11px;color:var(--mut)}
+  @media (max-width:420px){ html,body{font-size:13.5px} pre{padding:16px 14px 22px} }
+  @media (prefers-color-scheme:dark){
+    :root{ --paper:#1b1b1f; --bg:#111114; --ink:#e9e7e1; --mut:#7d7b75; --line:#2b2b31; --red:#ff5a3c; }
+  }
+</style>
+</head>
+<body>
+<div class="win">
+  <div class="bar"><span>secret.txt - Bloc-notes</span><i>_ □ ×</i></div>
+  <div class="menu">Fichier Edition Format Affichage Aide</div>
+<pre>Merci d'avoir été jusque là !
+Pour te récompenser,
+voici un petit secret...
+
+<b>root@aywen:~$ ./snake</b>
+Un Snake caché : Root en tête,
+Aywen à la place des pommes.
+
+== COMMENT JOUER ==
+
+  Bouger   ← ↑ → ↓  ou  ZQSD
+  Pause    Espace
+  Mobile   glisse le doigt
+
+  1. Mange un max d'Aywen.
+  2. Évite les murs et
+     ta propre queue.
+  3. Tous les 10 Aywen,
+     l'équipe tombe en confettis.
+  4. Ça accélère vite.
+
+== OBJETS RARES ==
+
+  Visibles quelques secondes.
+  Ouvre l'œil.
+
+  Page de la BD ...... +2
+  Pièce R$ ........... +2
+  Le sosie ........... +3
+  Aywen en or ........ +5
+
+== TROPHÉES ==
+
+  14 à débloquer.
+  Indice : haut, haut, bas, bas...
+
+&gt; <a href="../">Lancer le jeu</a>
+
+N'hésite pas à partager ton score
+dans le canal <b>#médias</b> du Discord !
+<span class="cur"></span></pre>
+  <div class="status"><span>Ln 41, Col 1</span><span>UTF-8</span></div>
+</div>
+</body>
+</html>
